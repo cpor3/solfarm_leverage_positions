@@ -1,4 +1,4 @@
-from solfarm_layouts import VAULT_LAYOUT, LENDING_OBLIGATION_LAYOUT
+from solfarm_layouts import VAULT_LAYOUT, MINT_LAYOUT, LENDING_OBLIGATION_LAYOUT
 from solana.publickey import PublicKey
 from solana.rpc.api import Client
 from solfarm_vaults import Solfarm_Vault
@@ -21,12 +21,19 @@ def main():
     # RAY-USDT vault
     vault = Solfarm_Vault.RayUsdtVault
     vault_account = '1ZpdBUTiDLTUe3izSdYfRXSf93fpJPmoKtA5bFjGesS' # RAY-USDT account, from https://gist.github.com/therealssj/c6049ac59863df454fb3f4ff19b529ee#file-solfarm_ray_vault-json-L816
-    LP_decimals = 6
 
     # Get vault info
     solana = Client(SOLANA_ENDPOINT)
     vault_raw_data = solana.get_account_info(vault_account, commitment='confirmed')
     vault_decoded_data = VAULT_LAYOUT.parse(base64.b64decode(vault_raw_data['result']['value']['data'][0]))
+
+    # Get LP decimals
+    lp_mint_address = PublicKey(vault_decoded_data.lp_token_mint)
+    lp_mint_raw_data = solana.get_account_info(lp_mint_address, commitment='confirmed')
+    lp_mint_decoded_data = MINT_LAYOUT.parse(base64.b64decode(lp_mint_raw_data['result']['value']['data'][0]))
+    LP_decimals = lp_mint_decoded_data.decimals
+    print('LP decimals:', LP_decimals)
+
     total_vault_balance = vault_decoded_data.total_vault_balance / (10 ** LP_decimals)
     total_vault_shares = vault_decoded_data.total_vlp_shares
     print('total_vault_balance:', total_vault_balance)

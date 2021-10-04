@@ -1,4 +1,4 @@
-from construct import Bytes, Padding, Int64ul, Int8ul, Struct
+from construct import Bytes, Padding, Int64ul, Int32ul, Int8ul, Struct
 from construct.core import BytesInteger, Flag
 
 VAULT_LAYOUT = Struct(
@@ -20,6 +20,16 @@ VAULT_LAYOUT = Struct(
     "reward_b_account" / Bytes(32),
     "swap_to_account" / Bytes(32),
     "total_vlp_shares" / Int64ul
+)
+
+MINT_LAYOUT = Struct(
+  "mintAuthorityOption" / Int32ul,
+  "mintAuthority" / Bytes(32),
+  "supply" / Int64ul,
+  "decimals" / Int8ul,
+  "initialized" / Flag,
+  "freezeAuthorityOption" / Int32ul,
+  "freezeAuthority" / Bytes(32)
 )
 
 LENDING_OBLIGATION_LAYOUT = Struct(
